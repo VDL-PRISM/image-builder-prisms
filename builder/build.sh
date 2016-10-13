@@ -20,7 +20,10 @@ BUILD_PATH="/build"
 # Show TRAVSI_TAG in travis builds
 echo TRAVIS_TAG="${TRAVIS_TAG}"
 
-HYPRIOT_IMAGE="hypriotos-rpi-${HYPRIOT_OS_VERSION}.img.zip"
+HYPRIOT_IMAGE_ZIP="hypriotos-rpi-${HYPRIOT_OS_VERSION}.img.zip"
+HYPRIOT_IMAGE_PATH_ZIP="${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_ZIP}"
+
+HYPRIOT_IMAGE="hypriotos-rpi-${HYPRIOT_OS_VERSION}.img"
 HYPRIOT_IMAGE_PATH="${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE}"
 
 # create build directory for assembling our image filesystem
@@ -29,16 +32,21 @@ mkdir ${BUILD_PATH}
 
 # download HypriotOS
 if [ ! -f "${HYPRIOT_IMAGE_PATH}" ]; then
-  wget -q -O "${HYPRIOT_IMAGE_PATH}" "https://github.com/hypriot/os-rootfs/releases/download/${HYPRIOT_OS_VERSION}/${HYPRIOT_IMAGE}"
+  wget -q -O "${HYPRIOT_IMAGE_PATH_ZIP}" "https://github.com/hypriot/image-builder-rpi/releases/download/${HYPRIOT_OS_VERSION}/${HYPRIOT_IMAGE_ZIP}"
+
+  # verify checksum of our root filesystem
+  echo "${HYPRIOT_IMAGE_CHECKSUM} ${HYPRIOT_IMAGE_PATH_ZIP}" | sha256sum -c -
+
+  # extract HypriotOS image
+  unzip -p "${HYPRIOT_IMAGE_PATH_ZIP}" > "${HYPRIOT_IMAGE_PATH}"
+
+  rm "${HYPRIOT_IMAGE_PATH_ZIP}"
 fi
 
-# verify checksum of our root filesystem
-echo "${HYPRIOT_IMAGE_CHECKSUM} ${HYPRIOT_IMAGE_PATH}" | sha256sum -c -
-
-# extract HypriotOS image
-unzip "${HYPRIOT_IMAGE_PATH}" -d "${BUILD_PATH}"
 
 # extract parts of image
+
+# delete image zip
 
 
 # # register qemu-arm with binfmt
