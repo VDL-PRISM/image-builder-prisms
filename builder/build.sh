@@ -20,6 +20,11 @@ BUILD_PATH="/build"
 # Show TRAVSI_TAG in travis builds
 echo TRAVIS_TAG="${TRAVIS_TAG}"
 
+# name of the sd-image we gonna create
+PRISMS_IMAGE_VERSION=${VERSION:="dirty"}
+PRISMS_IMAGE_NAME="prisms-rpi-${PRISMS_IMAGE_VERSION}.img"
+export PRISMS_IMAGE_VERSION
+
 HYPRIOT_IMAGE_ZIP="hypriotos-rpi-${HYPRIOT_OS_VERSION}.img.zip"
 HYPRIOT_IMAGE_PATH_ZIP="${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_ZIP}"
 
@@ -71,7 +76,6 @@ mount -t proc none ${BUILD_PATH}/proc
 mount -t sysfs none ${BUILD_PATH}/sys
 
 # modify/add image files directly
-# e.g. root partition resize script
 cp -R /builder/files/* ${BUILD_PATH}/
 
 # make our build directory the current root
@@ -89,40 +93,40 @@ umount -l ${BUILD_PATH}/sys
 # ensure that there are no leftover artifacts in the pseudo filesystems
 rm -rf ${BUILD_PATH}/{dev,sys,proc}/*
 
-# tar -czf /image_with_kernel_boot.tar.gz -C ${BUILD_PATH}/boot .
-# du -sh ${BUILD_PATH}/boot
-# rm -Rf ${BUILD_PATH}/boot
-# tar -czf /image_with_kernel_root.tar.gz -C ${BUILD_PATH} .
-# du -sh ${BUILD_PATH}
-# ls -alh /image_with_kernel_*.tar.gz
+tar -czf /image_with_kernel_boot.tar.gz -C ${BUILD_PATH}/boot .
+du -sh ${BUILD_PATH}/boot
+rm -Rf ${BUILD_PATH}/boot
+tar -czf /image_with_kernel_root.tar.gz -C ${BUILD_PATH} .
+du -sh ${BUILD_PATH}
+ls -alh /image_with_kernel_*.tar.gz
 
-# # # download the ready-made raw image for the RPi
-# if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
-#   wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://github.com/hypriot/image-builder-raw/releases/download/${RAW_IMAGE_VERSION}/${RAW_IMAGE}.zip"
-# fi
+# download the ready-made raw image for the RPi
+if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
+  wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://github.com/hypriot/image-builder-raw/releases/download/${RAW_IMAGE_VERSION}/${RAW_IMAGE}.zip"
+fi
 
 # # verify checksum of the ready-made raw image
-# echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
+echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -c -
 
-# unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "/${HYPRIOT_IMAGE_NAME}"
+unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "/${PRISMS_IMAGE_NAME}"
 
-# # create the image and add root base filesystem
-# guestfish -a "/${HYPRIOT_IMAGE_NAME}"<<_EOF_
-#   run
-#   #import filesystem content
-#   mount /dev/sda2 /
-#   tar-in /image_with_kernel_root.tar.gz / compress:gzip
-#   mkdir /boot
-#   mount /dev/sda1 /boot
-#   tar-in /image_with_kernel_boot.tar.gz /boot compress:gzip
-# _EOF_
+# create the image and add root base filesystem
+guestfish -a "/${PRISMS_IMAGE_NAME}"<<_EOF_
+  run
+  #import filesystem content
+  mount /dev/sda2 /
+  tar-in /image_with_kernel_root.tar.gz / compress:gzip
+  mkdir /boot
+  mount /dev/sda1 /boot
+  tar-in /image_with_kernel_boot.tar.gz /boot compress:gzip
+_EOF_
 
-# # ensure that the travis-ci user can access the sd-card image file
-# umask 0000
+# ensure that the travis-ci user can access the sd-card image file
+umask 0000
 
-# # compress image
-# zip "${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_NAME}.zip" "${HYPRIOT_IMAGE_NAME}"
-# cd ${BUILD_RESULT_PATH} && sha256sum "${HYPRIOT_IMAGE_NAME}.zip" > "${HYPRIOT_IMAGE_NAME}.zip.sha256" && cd -
+# compress image
+zip "${BUILD_RESULT_PATH}/${PRISMS_IMAGE_NAME}.zip" "${PRISMS_IMAGE_NAME}"
+cd ${BUILD_RESULT_PATH} && sha256sum "${PRISMS_IMAGE_NAME}.zip" > "${PRISMS_IMAGE_NAME}.zip.sha256" && cd -
 
-# # test sd-image that we have built
-# VERSION=${HYPRIOT_IMAGE_VERSION} rspec --format documentation --color ${BUILD_RESULT_PATH}/builder/test
+# test sd-image that we have built
+VERSION=${PRISMS_IMAGE_VERSION} rspec --format documentation --color ${BUILD_RESULT_PATH}/builder/test
