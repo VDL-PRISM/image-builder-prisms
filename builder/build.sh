@@ -43,24 +43,32 @@ if [ ! -f "${HYPRIOT_IMAGE_PATH}" ]; then
   rm "${HYPRIOT_IMAGE_PATH_ZIP}"
 fi
 
-
 # extract parts of image
+guestfish -a "/${HYPRIOT_IMAGE_PATH}"<<_EOF_
+  run
+  #import filesystem content
+  mount /dev/sda2 /
+  tar-out / /image_with_kernel_root.tar.gz compress:gzip
+  mount /dev/sda1 /boot
+  tar-out /boot /image_with_kernel_boot.tar.gz compress:gzip
+_EOF_
 
-# delete image zip
+# untar file system to BUILD_PATH
+tar -zxf image_with_kernel_root.tar.gz -C ${BUILD_PATH}
+tar -zxf image_with_kernel_boot.tar.gz -C ${BUILD_PATH}/boot/
 
+# register qemu-arm with binfmt
+# to ensure that binaries we use in the chroot
+# are executed via qemu-arm
+update-binfmts --enable qemu-arm
 
-# # register qemu-arm with binfmt
-# # to ensure that binaries we use in the chroot
-# # are executed via qemu-arm
-# update-binfmts --enable qemu-arm
+# set up mount points for the pseudo filesystems
+mkdir -p ${BUILD_PATH}/{proc,sys,dev/pts}
 
-# # set up mount points for the pseudo filesystems
-# mkdir -p ${BUILD_PATH}/{proc,sys,dev/pts}
-
-# mount -o bind /dev ${BUILD_PATH}/dev
-# mount -o bind /dev/pts ${BUILD_PATH}/dev/pts
-# mount -t proc none ${BUILD_PATH}/proc
-# mount -t sysfs none ${BUILD_PATH}/sys
+mount -o bind /dev ${BUILD_PATH}/dev
+mount -o bind /dev/pts ${BUILD_PATH}/dev/pts
+mount -t proc none ${BUILD_PATH}/proc
+mount -t sysfs none ${BUILD_PATH}/sys
 
 # # modify/add image files directly
 # # e.g. root partition resize script
