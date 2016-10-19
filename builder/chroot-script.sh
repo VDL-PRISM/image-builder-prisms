@@ -32,7 +32,7 @@ wget -q https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}
 sudo dpkg -i influxdb_${INFLUXDB_VERSION}_armhf.deb
 
 # TODO: Rename host name?
-# TODO: Rename user?
+# TODO: Rename user and password?
 
 # cleanup APT cache and lists
 apt-get clean
