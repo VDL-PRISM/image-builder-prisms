@@ -44,18 +44,18 @@ if [ ! -f "${HYPRIOT_IMAGE_PATH}" ]; then
 fi
 
 # extract parts of image
-guestfish -a "/${HYPRIOT_IMAGE_PATH}"<<_EOF_
+guestfish -a "${HYPRIOT_IMAGE_PATH}"<<_EOF_
   run
   #import filesystem content
   mount /dev/sda2 /
-  tar-out / /image_with_kernel_root.tar.gz compress:gzip
+  tar-out / /image_root.tar.gz compress:gzip
   mount /dev/sda1 /boot
-  tar-out /boot /image_with_kernel_boot.tar.gz compress:gzip
+  tar-out /boot /image_boot.tar.gz compress:gzip
 _EOF_
 
 # untar file system to BUILD_PATH
-tar -zxf image_with_kernel_root.tar.gz -C ${BUILD_PATH}
-tar -zxf image_with_kernel_boot.tar.gz -C ${BUILD_PATH}/boot/
+tar -zxf image_root.tar.gz -C ${BUILD_PATH}
+tar -zxf image_boot.tar.gz -C ${BUILD_PATH}/boot/
 
 # register qemu-arm with binfmt
 # to ensure that binaries we use in the chroot
