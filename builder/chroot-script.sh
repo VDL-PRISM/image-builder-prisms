@@ -15,3 +15,6 @@ apt-get install -y \
 # TODO: Rename host name?
 # TODO: Rename user?
 
+# cleanup APT cache and lists
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
