@@ -70,24 +70,24 @@ mount -o bind /dev/pts ${BUILD_PATH}/dev/pts
 mount -t proc none ${BUILD_PATH}/proc
 mount -t sysfs none ${BUILD_PATH}/sys
 
-# # modify/add image files directly
-# # e.g. root partition resize script
-# cp -R /builder/files/* ${BUILD_PATH}/
+# modify/add image files directly
+# e.g. root partition resize script
+cp -R /builder/files/* ${BUILD_PATH}/
 
-# # make our build directory the current root
-# # and install the Rasberry Pi firmware, kernel packages,
-# # docker tools and some customizations
-# chroot ${BUILD_PATH} /bin/bash < /builder/chroot-script.sh
+# make our build directory the current root
+# and install the Rasberry Pi firmware, kernel packages,
+# docker tools and some customizations
+chroot ${BUILD_PATH} /bin/bash < /builder/chroot-script.sh
 
-# # unmount pseudo filesystems
-# umount -l ${BUILD_PATH}/dev/pts
-# umount -l ${BUILD_PATH}/dev
-# umount -l ${BUILD_PATH}/proc
-# umount -l ${BUILD_PATH}/sys
+# unmount pseudo filesystems
+umount -l ${BUILD_PATH}/dev/pts
+umount -l ${BUILD_PATH}/dev
+umount -l ${BUILD_PATH}/proc
+umount -l ${BUILD_PATH}/sys
 
-# # package image filesytem into two tarballs - one for bootfs and one for rootfs
-# # ensure that there are no leftover artifacts in the pseudo filesystems
-# rm -rf ${BUILD_PATH}/{dev,sys,proc}/*
+# package image filesytem into two tarballs - one for bootfs and one for rootfs
+# ensure that there are no leftover artifacts in the pseudo filesystems
+rm -rf ${BUILD_PATH}/{dev,sys,proc}/*
 
 # tar -czf /image_with_kernel_boot.tar.gz -C ${BUILD_PATH}/boot .
 # du -sh ${BUILD_PATH}/boot
@@ -96,7 +96,7 @@ mount -t sysfs none ${BUILD_PATH}/sys
 # du -sh ${BUILD_PATH}
 # ls -alh /image_with_kernel_*.tar.gz
 
-# # download the ready-made raw image for the RPi
+# # # download the ready-made raw image for the RPi
 # if [ ! -f "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" ]; then
 #   wget -q -O "${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" "https://github.com/hypriot/image-builder-raw/releases/download/${RAW_IMAGE_VERSION}/${RAW_IMAGE}.zip"
 # fi
