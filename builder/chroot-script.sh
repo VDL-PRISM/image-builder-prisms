@@ -18,10 +18,15 @@ useradd -u 1001 -g 1001 -rm homeassistant
 # Install Home Assistant
 python3 -m venv /srv/homeassistant && \
   chown -R homeassistant:homeassistant /srv/homeassistant && \
-  su homeassistant -s /bin/bash -c " source /srv/homeassistant/bin/activate && pip3 install homeassistant==${HOME_ASSISTANT_VERSION}" && \
+  su homeassistant -s /bin/bash -c " source /srv/homeassistant/bin/activate && pip3 --no-cache-dir install homeassistant==${HOME_ASSISTANT_VERSION}" && \
   systemctl enable home-assistant@homeassistant.service
 
 # TODO: Install all of Home Assistant dependencies
+
+# Clean up Python caches
+find /srv/homeassistant/lib/ | \
+  grep -E "(__pycache__|\.pyc$)" | \
+  xargs rm -rf
 
 # Install mosquitto
 apt-get install -y \
@@ -34,6 +39,6 @@ sudo dpkg -i influxdb_${INFLUXDB_VERSION}_armhf.deb
 # TODO: Rename host name?
 # TODO: Rename user and password?
 
-# cleanup APT cache and lists
+# Cleanup APT cache and lists
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
