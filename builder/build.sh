@@ -64,7 +64,8 @@ tar -zxf image_boot.tar.gz -C ${BUILD_PATH}/boot/
 # register qemu-arm with binfmt
 # to ensure that binaries we use in the chroot
 # are executed via qemu-arm
-update-binfmts --enable qemu-arm
+# update-binfmts --enable qemu-arm
+cp /usr/bin/qemu-arm-static ${BUILD_PATH}/usr/bin
 
 # set up mount points for the pseudo filesystems
 mkdir -p ${BUILD_PATH}/{proc,sys,dev/pts}
