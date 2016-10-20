@@ -33,8 +33,8 @@ apt-get install -y \
   mosquitto
 
 # Install influxdb
-wget -q https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_armhf.deb
-sudo dpkg -i influxdb_${INFLUXDB_VERSION}_armhf.deb
+wget -q "https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_armhf.deb"
+sudo dpkg -i "influxdb_${INFLUXDB_VERSION}_armhf.deb"
 
 # TODO: Rename host name?
 # TODO: Rename user and password?
