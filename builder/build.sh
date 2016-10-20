@@ -110,6 +110,13 @@ echo "${RAW_IMAGE_CHECKSUM} ${BUILD_RESULT_PATH}/${RAW_IMAGE}.zip" | sha256sum -
 
 unzip -p "${BUILD_RESULT_PATH}/${RAW_IMAGE}" > "/${PRISMS_IMAGE_NAME}"
 
+# Since we added more stuff, we need to extend the file system
+truncate -r "/${PRISMS_IMAGE_NAME}" "/new-${PRISMS_IMAGE_NAME}"
+truncate -s +1G "/new-${PRISMS_IMAGE_NAME}"
+virt-resize --expand /dev/sda2 "/${PRISMS_IMAGE_NAME}" "/new-${PRISMS_IMAGE_NAME}"
+mv "/new-${PRISMS_IMAGE_NAME}" "/${PRISMS_IMAGE_NAME}"
+ls -alh "/${PRISMS_IMAGE_NAME}"
+
 # create the image and add root base filesystem
 guestfish -a "/${PRISMS_IMAGE_NAME}"<<_EOF_
   run
