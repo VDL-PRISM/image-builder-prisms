@@ -25,31 +25,32 @@ PRISMS_IMAGE_VERSION=${VERSION:="dirty"}
 PRISMS_IMAGE_NAME="prisms-rpi-${PRISMS_IMAGE_VERSION}.img"
 export PRISMS_IMAGE_VERSION
 
-HYPRIOT_IMAGE_ZIP="hypriotos-rpi-${HYPRIOT_OS_VERSION}.img.zip"
-HYPRIOT_IMAGE_PATH_ZIP="${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE_ZIP}"
+http://director.downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2016-09-28/2016-09-23-raspbian-jessie-lite.zip
 
-HYPRIOT_IMAGE="hypriotos-rpi-${HYPRIOT_OS_VERSION}.img"
-HYPRIOT_IMAGE_PATH="${BUILD_RESULT_PATH}/${HYPRIOT_IMAGE}"
+RASPBIAN_IMAGE="raspbian_lite-${RASPBIAN_VERSION}.img"
+RASPBIAN_IMAGE_PATH="${BUILD_RESULT_PATH}/${RASPBIAN_IMAGE}"
+RASPBIAN_IMAGE_ZIP="${RASPBIAN_IMAGE}.zip"
+RASPBIAN_IMAGE_PATH_ZIP="${BUILD_RESULT_PATH}/${RASPBIAN_IMAGE_ZIP}"
 
 # create build directory for assembling our image filesystem
 rm -rf ${BUILD_PATH}
 mkdir ${BUILD_PATH}
 
 # download HypriotOS
-if [ ! -f "${HYPRIOT_IMAGE_PATH}" ]; then
-  wget -q -O "${HYPRIOT_IMAGE_PATH_ZIP}" "https://github.com/hypriot/image-builder-rpi/releases/download/${HYPRIOT_OS_VERSION}/${HYPRIOT_IMAGE_ZIP}"
+if [ ! -f "${RASPBIAN_IMAGE_PATH}" ]; then
+  wget -q -O "${RASPBIAN_IMAGE_PATH_ZIP}" "http://director.downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-${RASPBIAN_VERSION}/${RASPBIAN_VERSION}-raspbian-jessie-lite.zip"
 
   # verify checksum of our root filesystem
-  echo "${HYPRIOT_IMAGE_CHECKSUM} ${HYPRIOT_IMAGE_PATH_ZIP}" | sha256sum -c -
+  # echo "${HYPRIOT_IMAGE_CHECKSUM} ${RASPBIAN_IMAGE_PATH_ZIP}" | sha256sum -c -
 
   # extract HypriotOS image
-  unzip -p "${HYPRIOT_IMAGE_PATH_ZIP}" > "${HYPRIOT_IMAGE_PATH}"
+  unzip -p "${RASPBIAN_IMAGE_PATH_ZIP}" > "${RASPBIAN_IMAGE_PATH}"
 
-  rm "${HYPRIOT_IMAGE_PATH_ZIP}"
+  rm "${RASPBIAN_IMAGE_PATH_ZIP}"
 fi
 
 # extract parts of image
-guestfish -a "${HYPRIOT_IMAGE_PATH}"<<_EOF_
+guestfish -a "${RASPBIAN_IMAGE_PATH}"<<_EOF_
   run
   #import filesystem content
   mount /dev/sda2 /
