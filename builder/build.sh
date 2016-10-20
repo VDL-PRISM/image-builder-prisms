@@ -25,8 +25,6 @@ PRISMS_IMAGE_VERSION=${VERSION:="dirty"}
 PRISMS_IMAGE_NAME="prisms-rpi-${PRISMS_IMAGE_VERSION}.img"
 export PRISMS_IMAGE_VERSION
 
-http://director.downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2016-09-28/2016-09-23-raspbian-jessie-lite.zip
-
 RASPBIAN_IMAGE="raspbian_lite-${RASPBIAN_VERSION}.img"
 RASPBIAN_IMAGE_PATH="${BUILD_RESULT_PATH}/${RASPBIAN_IMAGE}"
 RASPBIAN_IMAGE_ZIP="${RASPBIAN_IMAGE}.zip"
