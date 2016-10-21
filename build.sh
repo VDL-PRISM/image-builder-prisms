@@ -97,6 +97,8 @@ umount -l ${BUILD_PATH}/dev
 umount -l ${BUILD_PATH}/boot
 umount -l ${BUILD_PATH}
 
+sleep 5
+
 # Delete loopback devices
 kpartx -d "${PRISMS_IMAGE_PATH}"
 
