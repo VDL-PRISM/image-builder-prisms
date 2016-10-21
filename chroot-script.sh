@@ -3,7 +3,7 @@ set -ex
 
 # Reload package sources
 apt-get update
-# DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+# DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical apt-get -y -o "Dpkg::Options::=--force-confdef" -o "Dpkg::Options::=--force-confold" dist-upgrade
 
 # Set default locales to 'en_US.UTF-8'
 echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen
@@ -28,7 +28,9 @@ chown -R homeassistant:homeassistant /srv/homeassistant
 su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip install --upgrade pip && pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}"
 systemctl enable home-assistant@homeassistant.service
 
-# TODO: Install all of Home Assistant dependencies
+# Install all of Home Assistant dependencies
+su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 install --no-cache-dir -r https://github.com/home-assistant/home-assistant/blob/dev/requirements_all.txt"
+su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 install --no-cache-dir python-persistent-queue"
 
 # Clean up Python caches
 find /srv/homeassistant/lib/ | \
