@@ -55,15 +55,18 @@ fi
 cp "${RASPBIAN_IMAGE_PATH}" "${PRISMS_IMAGE_PATH}"
 
 # Make loopback devices
-losetup -f -P --show "${PRISMS_IMAGE_PATH}"
+kpartx -a "${PRISMS_IMAGE_PATH}"
+
+# Wait some time for changes to be made
+sleep 5
 
 # Create build directory for assembling the filesystem
 rm -rf ${BUILD_PATH}
 mkdir ${BUILD_PATH}
 
 # Mount the image
-mount /dev/loop0p2 -o rw ${BUILD_PATH}
-mount /dev/loop0p1 -o rw ${BUILD_PATH}/boot
+mount /dev/mapper/loop0p2 -o rw ${BUILD_PATH}
+mount /dev/mapper/loop0p1 -o rw ${BUILD_PATH}/boot
 
 # Mount everything needed for the OS
 mount --bind /dev ${BUILD_PATH}/dev/
@@ -94,13 +97,14 @@ umount -l ${BUILD_PATH}/dev
 umount -l ${BUILD_PATH}/boot
 umount -l ${BUILD_PATH}
 
-losetup -d "${PRISMS_IMAGE_PATH}"
+# Delete loopback devices
+kpartx -d "${PRISMS_IMAGE_PATH}"
 
 # Ensure that the travis-ci user can access the sd-card image file
 umask 0000
 
 # Compress image
-zip "${BUILD_RESULT_PATH}/${PRISMS_IMAGE_NAME}.zip" "${PRISMS_IMAGE_PATH}"
+zip -j "${BUILD_RESULT_PATH}/${PRISMS_IMAGE_NAME}.zip" "${PRISMS_IMAGE_PATH}"
 cd ${BUILD_RESULT_PATH} && sha256sum "${PRISMS_IMAGE_NAME}.zip" > "${PRISMS_IMAGE_NAME}.zip.sha256" && cd -
 
 # Test sd-image that we have built
