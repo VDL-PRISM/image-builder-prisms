@@ -22,15 +22,16 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y \
 groupadd -f -r -g 1001 homeassistant
 useradd -u 1001 -g 1001 -rm homeassistant
 
-# Install Home Assistant
+# Install Home Assistant and all of its dependencies
 python3 -m venv /srv/homeassistant
 chown -R homeassistant:homeassistant /srv/homeassistant
-su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip install --upgrade pip && pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}"
+su homeassistant -s /bin/bash <<EOF
+source /srv/homeassistant/bin/activate
+pip3 install --upgrade pip
+pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}
+pip3 install --no-cache-dir -r https://raw.githubusercontent.com/home-assistant/home-assistant/dev/requirements_all.txt
+EOF
 systemctl enable home-assistant@homeassistant.service
-
-# Install all of Home Assistant dependencies
-su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 install --no-cache-dir -r https://github.com/home-assistant/home-assistant/blob/dev/requirements_all.txt"
-su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 install --no-cache-dir python-persistent-queue"
 
 # Clean up Python caches
 find /srv/homeassistant/lib/ | \
