@@ -1,12 +1,14 @@
 #!/bin/bash
 set -ex
 
-# reload package sources
-apt-get update
-apt-get upgrade -y
+# TODO: Set locale
+
+# Reload package sources
+DEBIAN_FRONTEND=noninteractive apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
 # Install Python 3 for Home Assistant
-apt-get install -y \
+DEBIAN_FRONTEND=noninteractive apt-get install -y \
   python3 \
   python3-venv \
   python3-pip
@@ -18,8 +20,7 @@ useradd -u 1001 -g 1001 -rm homeassistant
 # Install Home Assistant
 python3 -m venv /srv/homeassistant
 chown -R homeassistant:homeassistant /srv/homeassistant
-su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 -V && pip install --upgrade pip"
-su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}"
+su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip install --upgrade pip && pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}"
 systemctl enable home-assistant@homeassistant.service
 
 # TODO: Install all of Home Assistant dependencies
@@ -35,7 +36,7 @@ apt-get install -y \
 
 # Install influxdb
 wget -q "https://dl.influxdata.com/influxdb/releases/influxdb_${INFLUXDB_VERSION}_armhf.deb"
-sudo dpkg -i "influxdb_${INFLUXDB_VERSION}_armhf.deb"
+dpkg -i "influxdb_${INFLUXDB_VERSION}_armhf.deb"
 
 # TODO: Rename host name?
 # TODO: Rename user and password?
