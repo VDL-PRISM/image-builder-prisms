@@ -1,11 +1,16 @@
 #!/bin/bash
 set -ex
 
-# TODO: Set locale
-
 # Reload package sources
-DEBIAN_FRONTEND=noninteractive apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+apt-get update
+# DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+
+# Set default locales to 'en_US.UTF-8'
+echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen
+locale-gen
+
+echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections
+dpkg-reconfigure -f noninteractive locales
 
 # Install Python 3 for Home Assistant
 DEBIAN_FRONTEND=noninteractive apt-get install -y \
