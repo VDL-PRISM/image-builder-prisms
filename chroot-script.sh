@@ -29,7 +29,7 @@ su homeassistant -s /bin/bash <<EOF
 source /srv/homeassistant/bin/activate
 pip3 install --upgrade pip
 pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}
-pip3 install --no-cache-dir -r https://raw.githubusercontent.com/home-assistant/home-assistant/dev/requirements_all.txt
+# pip3 install --no-cache-dir -r https://raw.githubusercontent.com/home-assistant/home-assistant/dev/requirements_all.txt
 EOF
 systemctl enable home-assistant@homeassistant.service
 
