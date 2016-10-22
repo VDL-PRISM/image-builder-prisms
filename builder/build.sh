@@ -27,7 +27,7 @@ RASPBIAN_IMAGE_PATH_ZIP="${BUILD_RESULT_PATH}/${RASPBIAN_IMAGE_ZIP}"
 
 # Name of the sd-image
 PRISMS_IMAGE_VERSION=${VERSION:="dirty"}
-PRISMS_IMAGE_NAME="${PRISMS_IMAGE_VERSION}-prisms_${RASPBIAN_IMAGE_NAME}.img"
+PRISMS_IMAGE_NAME="prisms-${PRISMS_IMAGE_VERSION}_${RASPBIAN_IMAGE_NAME}.img"
 export PRISMS_IMAGE_VERSION
 
 # Create build directory for assembling our image filesystem
