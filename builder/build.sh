@@ -1,20 +1,21 @@
 #!/bin/bash -e
 set -x
+
 # This script should be run only inside of a Docker container
 if [ ! -f /.dockerenv ]; then
   echo "ERROR: script works only in a Docker container!"
   exit 1
 fi
 
-# get versions for software that needs to be installed
+# Get versions for software that needs to be installed
 source /workspace/versions.config
 
 ### setting up some important variables to control the build process
 
-# place to store our created sd-image file
+# Place to store our created sd-image file
 BUILD_RESULT_PATH="/workspace"
 
-# place to build our sd-image
+# Place to build our sd-image
 BUILD_PATH="/build"
 
 # Show TRAVSI_TAG in travis builds
@@ -27,7 +28,7 @@ RASPBIAN_IMAGE_PATH_ZIP="${BUILD_RESULT_PATH}/${RASPBIAN_IMAGE_ZIP}"
 
 # Name of the sd-image
 PRISMS_IMAGE_VERSION=${VERSION:="dirty"}
-PRISMS_IMAGE_NAME="prisms-${PRISMS_IMAGE_VERSION}_${RASPBIAN_IMAGE_NAME}.img"
+PRISMS_IMAGE_NAME="prisms-${PRISMS_IMAGE_VERSION}_${RASPBIAN_IMAGE_NAME}"
 export PRISMS_IMAGE_VERSION
 
 # Create build directory for assembling our image filesystem
@@ -49,41 +50,42 @@ fi
 
 cp "${RASPBIAN_IMAGE_PATH}" "/${PRISMS_IMAGE_NAME}"
 
-# TODO: Extend file system?
+# TODO: Extend file system
 
 # Register qemu-arm with binfmt to ensure that binaries we use in the chroot
 # are executed via qemu-arm
 update-binfmts --enable qemu-arm
 
+# Mount the image
 guestmount -a "/${PRISMS_IMAGE_NAME}" -m /dev/sda2:/ -m /dev/sda1:/boot "${BUILD_PATH}"
 
+# Mount pseudo filesystems
 mount -o bind /dev ${BUILD_PATH}/dev
 mount -o bind /dev/pts ${BUILD_PATH}/dev/pts
 mount -t proc none ${BUILD_PATH}/proc
 mount -t sysfs none ${BUILD_PATH}/sys
 
-# modify/add image files directly
+# Modify/add image files directly
 cp -R /builder/files/* ${BUILD_PATH}/
 
-# make our build directory the current root
-# and install the Rasberry Pi firmware, kernel packages,
-# docker tools and some customizations
+# Install everything needed on the image
 chroot ${BUILD_PATH} /bin/bash < /builder/chroot-script.sh
 
-# unmount pseudo filesystems
+# Unmount pseudo filesystems
 umount -l ${BUILD_PATH}/dev/pts
 umount -l ${BUILD_PATH}/dev
 umount -l ${BUILD_PATH}/proc
 umount -l ${BUILD_PATH}/sys
 
+# Unmount the image
 guestunmount "${BUILD_PATH}"
 
-# ensure that the travis-ci user can access the sd-card image file
+# Ensure that the travis-ci user can access the sd-card image file
 umask 0000
 
-# compress image
+# Compress image
 zip "${BUILD_RESULT_PATH}/${PRISMS_IMAGE_NAME}.zip" "/${PRISMS_IMAGE_NAME}"
 cd ${BUILD_RESULT_PATH} && sha256sum "${PRISMS_IMAGE_NAME}.zip" > "${PRISMS_IMAGE_NAME}.zip.sha256" && cd -
 
-# test sd-image that we have built
+# Test sd-image that we have built
 # VERSION=${PRISMS_IMAGE_VERSION} rspec --format documentation --color ${BUILD_RESULT_PATH}/builder/test
