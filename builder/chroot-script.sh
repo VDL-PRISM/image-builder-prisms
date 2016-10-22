@@ -25,11 +25,15 @@ useradd -u 1001 -g 1001 -rm homeassistant
 # Install Home Assistant
 python3 -m venv /srv/homeassistant
 chown -R homeassistant:homeassistant /srv/homeassistant
-su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 -V && pip install --upgrade pip"
-su homeassistant -s /bin/bash -c "source /srv/homeassistant/bin/activate && pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}"
-systemctl enable home-assistant@homeassistant.service
 
+su homeassistant -s /bin/bash <<EOF
+source /srv/homeassistant/bin/activate
+pip3 install --upgrade pip
+pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}
 # TODO: Install all of Home Assistant dependencies
+# pip3 install --no-cache-dir -r https://raw.githubusercontent.com/home-assistant/home-assistant/dev/requirements_all.txt
+EOF
+systemctl enable home-assistant@homeassistant.service
 
 # Clean up Python caches
 find /srv/homeassistant/lib/ | \
