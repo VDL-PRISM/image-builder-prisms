@@ -37,7 +37,7 @@ mkdir ${BUILD_PATH}
 
 # Download Raspbian
 if [ ! -f "${RASPBIAN_IMAGE_PATH}" ]; then
-  wget -q -O "${RASPBIAN_IMAGE_PATH_ZIP}" "https://downloads.raspberrypi.org/raspbian_lite/images/${RASPBIAN_IMAGE_ZIP_NAME}"
+  wget -q -O "${RASPBIAN_IMAGE_PATH_ZIP}" "https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-${RASPBIAN_FOLDER}/${RASPBIAN_IMAGE_ZIP_NAME}"
 
   # Verify checksum of our root filesystem
   echo "${ASPBIAN_IMAGE_CHECKSUM} ${RASPBIAN_IMAGE_PATH_ZIP}" | sha1sum -c -
