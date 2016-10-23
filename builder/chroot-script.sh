@@ -24,17 +24,19 @@ apt-get install -y \
 groupadd -f -r -g 1001 homeassistant
 useradd -u 1001 -g 1001 -rm homeassistant
 
+# Add new user to a few groups
+for GRP in video gpio i2c spi; do
+  adduser homeassistant $GRP
+done
+
 # Install Home Assistant
 python3 -m venv /srv/homeassistant
-chown -R homeassistant:homeassistant /srv/homeassistant
-
-su homeassistant -s /bin/bash <<EOF
 source /srv/homeassistant/bin/activate
 pip3 install --upgrade pip
 pip3 install --no-cache-dir homeassistant==${HOME_ASSISTANT_VERSION}
 # TODO: Install all of Home Assistant dependencies
 # pip3 install --no-cache-dir -r https://raw.githubusercontent.com/home-assistant/home-assistant/dev/requirements_all.txt
-EOF
+chown -R homeassistant:homeassistant /srv/homeassistant
 systemctl enable home-assistant@homeassistant.service
 
 # Clean up Python caches
