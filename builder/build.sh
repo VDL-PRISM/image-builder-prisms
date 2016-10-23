@@ -56,6 +56,9 @@ cp "${RASPBIAN_IMAGE_PATH}" "/${PRISMS_IMAGE_NAME}"
 # are executed via qemu-arm
 update-binfmts --enable qemu-arm
 
+# Copy necessary executable
+cp /usr/bin/qemu-arm-static "${BUILD_PATH}/usr/bin/"
+
 # Mount the image
 guestmount -a "/${PRISMS_IMAGE_NAME}" -m /dev/sda2:/ -m /dev/sda1:/boot "${BUILD_PATH}"
 
@@ -79,6 +82,9 @@ umount -l ${BUILD_PATH}/sys
 
 # Unmount the image
 guestunmount "${BUILD_PATH}"
+
+# Remove the copied executable
+rm "${BUILD_PATH}/usr/bin/qemu-arm-static"
 
 # Ensure that the travis-ci user can access the sd-card image file
 umask 0000
