@@ -56,9 +56,6 @@ cp "${RASPBIAN_IMAGE_PATH}" "/${PRISMS_IMAGE_NAME}"
 # are executed via qemu-arm
 update-binfmts --enable qemu-arm
 
-# Copy necessary executable
-cp /usr/bin/qemu-arm-static "${BUILD_PATH}/usr/bin/"
-
 # Mount the image
 guestmount -a "/${PRISMS_IMAGE_NAME}" -m /dev/sda2:/ -m /dev/sda1:/boot "${BUILD_PATH}"
 
@@ -68,11 +65,23 @@ mount -o bind /dev/pts ${BUILD_PATH}/dev/pts
 mount -t proc none ${BUILD_PATH}/proc
 mount -t sysfs none ${BUILD_PATH}/sys
 
+# Copy necessary executable
+cp /usr/bin/qemu-arm-static "${BUILD_PATH}/usr/bin/"
+
+# Comment out every line in file
+sed -i 's/^/# /' ${BUILD_PATH}/etc/ld.so.preload
+
 # Modify/add image files directly
 cp -R /builder/files/* ${BUILD_PATH}/
 
 # Install everything needed on the image
 chroot ${BUILD_PATH} /bin/bash < /builder/chroot-script.sh
+
+# Uncomment out every line in file
+sed -i 's/^# //' ${BUILD_PATH}/etc/ld.so.preload
+
+# Remove the copied executable
+rm "${BUILD_PATH}/usr/bin/qemu-arm-static"
 
 # Unmount pseudo filesystems
 umount -l ${BUILD_PATH}/dev/pts
@@ -82,9 +91,6 @@ umount -l ${BUILD_PATH}/sys
 
 # Unmount the image
 guestunmount "${BUILD_PATH}"
-
-# Remove the copied executable
-rm "${BUILD_PATH}/usr/bin/qemu-arm-static"
 
 # Ensure that the travis-ci user can access the sd-card image file
 umask 0000
