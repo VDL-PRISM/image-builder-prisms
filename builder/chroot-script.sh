@@ -12,7 +12,7 @@ dpkg-reconfigure -f noninteractive locales
 
 # reload package sources
 apt-get update
-apt-get upgrade -y
+# apt-get upgrade -y
 
 # Install Python 3 for Home Assistant
 apt-get install -y \
